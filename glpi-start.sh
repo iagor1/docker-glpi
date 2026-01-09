@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#Controle du choix de version ou prise de la latest
 [[ ! "$VERSION_GLPI" ]] \
 	&& VERSION_GLPI=$(curl -s https://api.github.com/repos/glpi-project/glpi/releases/latest | grep tag_name | cut -d '"' -f 4)
 
@@ -10,20 +9,12 @@ echo "date.timezone = \"$TIMEZONE\"" > /etc/php/8.3/apache2/conf.d/timezone.ini;
 echo "date.timezone = \"$TIMEZONE\"" > /etc/php/8.3/cli/conf.d/timezone.ini;
 fi
 
-#Enable session.cookie_httponly
 sed -i 's,session.cookie_httponly = *\(on\|off\|true\|false\|0\|1\)\?,session.cookie_httponly = on,gi' /etc/php/8.3/apache2/php.ini
 
 FOLDER_GLPI=glpi/
 FOLDER_WEB=/var/www/html/
 
-#check if TLS_REQCERT is present
-if !(grep -q "TLS_REQCERT" /etc/ldap/ldap.conf)
-then
-	echo "TLS_REQCERT isn't present"
-    echo -e "TLS_REQCERT\tnever" >> /etc/ldap/ldap.conf
-fi
 
-#Téléchargement et extraction des sources de GLPI
 if [ "$(ls ${FOLDER_WEB}${FOLDER_GLPI}/bin)" ];
 then
 	echo "GLPI is already installed"
@@ -45,8 +36,7 @@ LOCAL_GLPI_MAJOR_VERSION=$(echo $LOCAL_GLPI_VERSION | cut -d. -f1)
 ## Remove dots from version string
 LOCAL_GLPI_VERSION_NUM=${LOCAL_GLPI_VERSION//./}
 
-## Target value is GLPI 1.0.7
-TARGET_GLPI_VERSION="10.0.7"
+TARGET_GLPI_VERSION="11.0.4"
 TARGET_GLPI_VERSION_NUM=${TARGET_GLPI_VERSION//./}
 TARGET_GLPI_MAJOR_VERSION=$(echo $TARGET_GLPI_VERSION | cut -d. -f1)
 

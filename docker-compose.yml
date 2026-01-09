@@ -1,20 +1,19 @@
 version: "3.2"
 
 services:
-#MariaDB Container
-  mariadb:
-    image: mariadb:10.7
-    container_name: mariadb
-    hostname: mariadb
+#db
+  mysql:
+    image: mysql:9
+    container_name: mysqldb
+    hostname: mysql
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
+      - mysqldb:/var/lib/mysql
     env_file:
-      - ./mariadb.env
+      - ./mysql.env
     restart: always
 
-#GLPI Container
   glpi:
-    image: diouxx/glpi
+    image: teste-glpi:1.0
     container_name : glpi
     hostname: glpi
     ports:
@@ -22,7 +21,11 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - /var/www/html/glpi/:/var/www/html/glpi
+      - glpi-data:/var/www/html/glpi
     environment:
-      - TIMEZONE=Europe/Brussels
+      - TIMEZONE=America/Sao_Paulo
     restart: always
+
+volumes:
+  mysqldb:
+  glpi-data:
