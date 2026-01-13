@@ -13,7 +13,16 @@ jobs:
       - name: Show tag name
         run: echo "Tag name -> $GITHUB_REF_NAME"
 
-      - name: Login in Github Container Registry
+      - name: Debug credentials
+        run: |
+          echo "Username length: ${#DOCKERHUB_USERNAME}"
+          echo "Token length: ${#DOCKERHUB_TOKEN}"
+          echo "Username first char: ${DOCKERHUB_USERNAME:0:1}"
+        env:
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login in DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
