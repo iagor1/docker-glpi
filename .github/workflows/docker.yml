@@ -1,26 +1,22 @@
 on:
   push:
+    branches:
+      - main
     tags:
       - '*'
+  workflow_dispatch: {}
+
 jobs:
   build-and-push:
     name: 1. Build and push docker image
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Show tag name
+        id: tag
         run: echo "Tag name -> $GITHUB_REF_NAME"
-
-      - name: Debug credentials
-        run: |
-          echo "Username length: ${#DOCKERHUB_USERNAME}"
-          echo "Token length: ${#DOCKERHUB_TOKEN}"
-          echo "Username first char: ${DOCKERHUB_USERNAME:0:1}"
-        env:
-          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login in DockerHub
         uses: docker/login-action@v3
@@ -33,3 +29,38 @@ jobs:
         with:
           push: true
           tags: iagorml/glpi:${{ github.ref_name }}
+
+  cd:
+    name: 2. Deploy to self-hosted runner
+    needs: build-and-push
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show user
+        run: |
+          whoami || true
+          id || true
+
+      - name: Show context
+        run: |
+          echo "Runner labels: $RUNNER_LABELS" || true
+          echo "Ref: $GITHUB_REF"
+
+      - name: Ensure docker is available
+        run: |
+          docker --version || true
+          docker compose version || true
+
+      - name: Update .env file
+        run: |
+          echo "GLPI_VERSION=${{ github.ref_name }}" > .env
+          cat .env
+
+      - name: Deploy with docker-compose
+        run: |
+          docker compose -f /data/glpi/docker-compose.yml up -d 
+
+
