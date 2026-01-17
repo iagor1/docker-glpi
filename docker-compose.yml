@@ -11,9 +11,14 @@ services:
     env_file:
       - ./mysql.env
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   glpi:
-    image: teste-glpi:1.0
+    image: iagorml/glpi:${GLPI_VERSION}
     container_name : glpi
     hostname: glpi
     ports:
@@ -25,6 +30,11 @@ services:
     environment:
       - TIMEZONE=America/Sao_Paulo
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
 volumes:
   mysqldb:
