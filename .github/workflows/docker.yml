@@ -39,11 +39,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show user
-        run: |
-          whoami || true
-          id || true
-
       - name: Show context
         run: |
           echo "Runner labels: $RUNNER_LABELS" || true
@@ -56,11 +51,11 @@ jobs:
 
       - name: Update .env file
         run: |
-          echo "GLPI_VERSION=${{ github.ref_name }}" > .env
-          cat .env
+          echo "GLPI_VERSION=${{ github.ref_name }}" > ${{ secrets.PATH_APP }}.env
+          cat ${{ secrets.PATH_APP }}.env
 
       - name: Deploy with docker-compose
         run: |
-          docker compose -f /data/glpi/docker-compose.yml up -d 
+          docker compose -f ${{ secrets.PATH_APP }}docker-compose.yml up -d 
 
 
